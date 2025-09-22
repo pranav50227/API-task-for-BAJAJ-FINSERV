@@ -37,9 +37,11 @@ public class StartupService {
                 .flatMap(response -> {
                     String webhook = (String) response.get("webhook");
                     String accessToken = (String) response.get("accessToken");
+                    System.out.println("Webhook: " + webhook);
+                    System.out.println("AccessToken: " + accessToken);
                     return submitSolution(webhook, accessToken);
                 })
-                .subscribe();
+                .subscribe(result -> System.out.println("Final result: " + result));
     }
 
     private Mono<String> submitSolution(String webhook, String accessToken) {
@@ -58,10 +60,14 @@ public class StartupService {
 
         return webClient.post()
                 .uri(webhook)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(submitBody)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .onErrorResume(e -> {
+                    System.out.println("Error submitting solution: " + e.getMessage());
+                    return Mono.just("Error: " + e.getMessage());
+                });
     }
 }

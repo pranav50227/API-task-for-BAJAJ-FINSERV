@@ -45,7 +45,7 @@ public class TestService {
 
         return webClient.post()
                 .uri(webhook)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(submitBody)
                 .retrieve()
